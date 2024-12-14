@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "foreo"
+version = "0.1.0"
+description = ""
+authors = ["Kanan Niftiyev <kananniftiyev010@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.13"
+beautifulsoup4 = "^4.12.3"
+nltk = "^3.9.1"
+pypdf = "^5.1.0"
+requests = "^2.32.3"
+pypdf2 = "^3.0.1"
+transformers = "^4.47.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+foreo = "foreo.main:main"
+
