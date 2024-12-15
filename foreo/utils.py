@@ -1,3 +1,8 @@
+from time import perf_counter
+import re
+
+
+
 def clean_article_text(article: str) -> str:
     """
     This function removes unwanted content such as brand names, newspaper names, and ads.
@@ -21,3 +26,15 @@ def clean_article_text(article: str) -> str:
     article_cleaned = re.sub(r'\s+', ' ', article_cleaned).strip()
 
     return article_cleaned
+
+
+def elapsed_time(logger):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            t1_start = perf_counter()
+            result = func(*args, **kwargs)
+            t1_stop = perf_counter()
+            logger.info(f"Elapsed time during {func.__name__} in seconds: {t1_stop - t1_start}")
+            return result
+        return wrapper
+    return decorator

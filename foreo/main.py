@@ -7,10 +7,9 @@ import torch
 import colorlog
 import re
 from time import perf_counter
-from .utils import clean_article_text
+from .utils import clean_article_text, elapsed_time
 import multiprocessing
-from substack import Api
-from substack.post import Post
+# TODO: add env
 
 # Set up Logger
 logger = logging.getLogger(__name__)
@@ -27,12 +26,12 @@ formatter = colorlog.ColoredFormatter(
         "CRITICAL": "bold_red",
     },
 )
-# Apply the formatter to the handler
 console_handler.setFormatter(formatter)
 logger.propagate = False
 logger.addHandler(console_handler)
 
 
+# TODO: Add more resources
 def fetch_news() -> list:
   """
 
@@ -78,17 +77,14 @@ def fetch_news() -> list:
   return articles
 
 
-# TODO: Generator Pref
-def summarize_articles() -> list:
+@elapsed_time(logger=logger)
+def summarize_articles(articles: list) -> list:
   """
 
   """
-  # Fetch the first article
-  a = fetch_news()
-  pre_article = " ".join(a)
+  pre_article = " ".join(articles)
   article = clean_article_text(pre_article)
   prompt = f"Summarize the following articles into a single coherent article with an introduction, body, and conclusion:\n{article}\n"
-  t1_start = perf_counter()
 
   logger.info("Summarizing articles...")
   tokenizer = AutoTokenizer.from_pretrained("google/long-t5-tglobal-base")
@@ -120,12 +116,10 @@ def summarize_articles() -> list:
       summaries.append(chunk_summary)
 
   # Combine the summaries from all chunks
-  t1_stop = perf_counter()
   final_summary = " ".join(summaries)
 
 
   logger.info("Final Summary: " + final_summary)
-  logger.info(f"Elapsed time during the summarize in seconds:{t1_stop-t1_start}")
   return summaries
 
 def translate_content():
@@ -133,8 +127,6 @@ def translate_content():
 
 def post_articles():
   pass
-
-
 
 def create_video():
   pass
@@ -144,7 +136,8 @@ def post_videos():
 
 
 def main():
-  post_articles()
+  news: list = fetch_news()
+  summarize_articles(articles=news)
 
 if __name__ == "__main__":
   main()
