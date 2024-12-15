@@ -9,6 +9,8 @@ import re
 from time import perf_counter
 from .utils import clean_article_text
 import multiprocessing
+from substack import Api
+from substack.post import Post
 
 # Set up Logger
 logger = logging.getLogger(__name__)
@@ -77,7 +79,7 @@ def fetch_news() -> list:
 
 
 # TODO: Generator Pref
-def summarize_articles():
+def summarize_articles() -> list:
   """
 
   """
@@ -124,12 +126,15 @@ def summarize_articles():
 
   logger.info("Final Summary: " + final_summary)
   logger.info(f"Elapsed time during the summarize in seconds:{t1_stop-t1_start}")
+  return summaries
 
 def translate_content():
   pass
 
 def post_articles():
   pass
+
+
 
 def create_video():
   pass
@@ -138,8 +143,8 @@ def post_videos():
   pass
 
 
-
-
-
 def main():
-  summarize_articles()
+  post_articles()
+
+if __name__ == "__main__":
+  main()

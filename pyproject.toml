@@ -16,6 +16,7 @@ transformers = "^4.47.0"
 torch = "^2.5.1"
 colorlog = "^6.9.0"
 python-substack = "^0.1.15"
+selenium = "^4.27.1"
 
 
 [build-system]
