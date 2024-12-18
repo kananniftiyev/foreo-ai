@@ -25,3 +25,35 @@
 
 - Performance Optimization (Future Work)
   The summarize_articles() function currently processes the chunks sequentially. Multiprocessing or multi-threading is suggested for faster processing, especially when handling long texts.
+
+  ## How to run project
+
+  Clone the project
+
+```bash
+  git clone https://link-to-project
+```
+
+Go to the project directory
+
+```bash
+  cd my-project
+```
+
+Enter Shell mode
+
+```bash
+  poetry shell
+```
+
+Install dependencies
+
+```bash
+  poetry install
+```
+
+Run Project
+
+```bash
+  poetry run foreo
+```
