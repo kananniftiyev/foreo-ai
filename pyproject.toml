@@ -8,15 +8,14 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.13"
 beautifulsoup4 = "^4.12.3"
-nltk = "^3.9.1"
-pypdf = "^5.1.0"
 requests = "^2.32.3"
-pypdf2 = "^3.0.1"
 transformers = "^4.47.0"
 torch = "^2.5.1"
 colorlog = "^6.9.0"
-python-substack = "^0.1.15"
 selenium = "^4.27.1"
+python-dotenv = "^1.0.1"
+protobuf = "^5.29.2"
+sentencepiece = "^0.2.0"
 
 
 [build-system]

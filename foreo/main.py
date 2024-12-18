@@ -1,15 +1,16 @@
 import requests
 from bs4 import BeautifulSoup, Tag
-from transformers import AutoTokenizer, LongT5Model, LongT5ForConditionalGeneration
+from transformers import AutoTokenizer, LongT5ForConditionalGeneration, MarianMTModel, MarianTokenizer
 import logging
 import time
 import torch
 import colorlog
-import re
-from time import perf_counter
 from .utils import clean_article_text, elapsed_time
 import multiprocessing
-# TODO: add env
+from dotenv import load_dotenv
+import os
+
+load_dotenv(".env")
 
 # Set up Logger
 logger = logging.getLogger(__name__)
@@ -29,6 +30,8 @@ formatter = colorlog.ColoredFormatter(
 console_handler.setFormatter(formatter)
 logger.propagate = False
 logger.addHandler(console_handler)
+
+DEEPL_API_KEY = os.getenv("DEEPL_API_KEY")
 
 
 # TODO: Add more resources
@@ -69,7 +72,7 @@ def fetch_news() -> list:
       articles.append(base_article)
       logger.info(f"Got article from {new_link}")
 
-      time.sleep(3) # Wait three seconds to not detect site
+      time.sleep(int(os.getenv("SECONDS_BETWEEN_FETCH"))) # Wait three seconds to not detect site
   except Exception as e:
     logger.error(f"Error occurred while fetching news: {e}")
     raise
@@ -80,8 +83,18 @@ def fetch_news() -> list:
 @elapsed_time(logger=logger)
 def summarize_articles(articles: list) -> list:
   """
+    Summarizes a list of articles into a single coherent summary with an introduction, body, and conclusion.
 
-  """
+    Parameters:
+    - articles (list): A list of articles, where each article is a string (could be a sentence, paragraph, etc.)
+
+    Returns:
+    - list: A list of summarized chunks of the original articles, with each chunk being a part of the final summary.
+
+    Example:
+    >>> summarize_articles(["This is article 1.", "This is article 2."])
+    ['Summary part 1...', 'Summary part 2...']
+    """
   pre_article = " ".join(articles)
   article = clean_article_text(pre_article)
   prompt = f"Summarize the following articles into a single coherent article with an introduction, body, and conclusion:\n{article}\n"
@@ -98,7 +111,6 @@ def summarize_articles(articles: list) -> list:
 
   summaries = []
 
-  # TODO: Multiprocess
   for chunk in chunks:
       inputs = tokenizer(chunk, return_tensors="pt", truncation=True, max_length=512)
 
@@ -108,22 +120,68 @@ def summarize_articles(articles: list) -> list:
       summary_ids = model.generate(inputs['input_ids'],
                                     max_length=300,
                                     min_length=100,
-                                    num_beams=4,
+                                    num_beams=8,
                                     length_penalty=2.0,
                                     early_stopping=True)
 
       chunk_summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
       summaries.append(chunk_summary)
 
-  # Combine the summaries from all chunks
   final_summary = " ".join(summaries)
 
 
   logger.info("Final Summary: " + final_summary)
   return summaries
 
-def translate_content():
-  pass
+def translate_content(articles: list) -> str:
+    """
+    Translates a list of articles into multiple target languages using the DeepL API.
+
+    Parameters:
+    - articles (list): A list of articles, where each article is a list of text strings that make up the full article.
+
+    Returns:
+    - str: A string containing the translated articles in different languages (Spanish, Polish, Turkish).
+
+    Example:
+    >>> translate_content([["This is an article.", "It has multiple sentences."]])
+    'Translated to ES:\nEste es un artículo.\nTiene varias oraciones.\n...'
+    """
+    def translate_text(text, target_language):
+        url = "https://api-free.deepl.com/v2/translate"
+
+        params = {
+            'auth_key': DEEPL_API_KEY,  # Your DeepL API key
+            'text': text,               # Text to be translated
+            'target_lang': target_language.upper()  # Target language (e.g., 'ES' for Spanish)
+        }
+
+        response = requests.post(url, data=params)
+
+        if response.status_code == 200:
+            result = response.json()
+            translated_text = result['translations'][0]['text']
+            return translated_text
+        else:
+            raise Exception(f"Error: {response.status_code}, {response.text}")
+
+    target_langs = ['es', 'pl', 'tr']  # Spanish, Polish, Turkish
+
+    translated_articles = []
+
+    for article in articles:
+        full_article = " ".join(article)
+
+        for lang in target_langs:
+            try:
+                translated_text = translate_text(full_article, lang)
+                translated_articles.append(f"Translated to {lang.upper()}:\n{translated_text}\n")
+            except Exception as e:
+                print(f"Error translating to {lang}: {e}")
+                translated_articles.append(f"Error translating to {lang.upper()}: {e}\n")
+
+    # Return all translations as a single string
+    return "\n".join(translated_articles)
 
 def post_articles():
   pass
@@ -137,7 +195,9 @@ def post_videos():
 
 def main():
   news: list = fetch_news()
-  summarize_articles(articles=news)
+  articles: list = summarize_articles(articles=news)
+  translated_content = translate_content(articles)
+  logger.info(translate_content)
 
 if __name__ == "__main__":
   main()
