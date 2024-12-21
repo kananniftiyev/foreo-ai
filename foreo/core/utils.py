@@ -1,5 +1,7 @@
 from time import perf_counter
 import re
+import colorlog
+import logging
 
 
 

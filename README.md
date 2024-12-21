@@ -31,7 +31,7 @@
   Clone the project
 
 ```bash
-  git clone https://link-to-project
+  git clone https://github.com/kananniftiyev/foreo-ai
 ```
 
 Go to the project directory
