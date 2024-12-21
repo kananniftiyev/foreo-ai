@@ -1,13 +1,15 @@
 import requests
 from bs4 import BeautifulSoup, Tag
 from transformers import AutoTokenizer, LongT5ForConditionalGeneration, MarianMTModel, MarianTokenizer
-from .utils import elapsed_time, clean_article_text
+from .utils import elapsed_time, clean_article_text, setup_logger
 import torch
 import time
 import os
+import colorlog
 import logging
 
-logger = logging.getLogger(__file__)
+logger = setup_logger()
+
 DEEPL_API_KEY = os.getenv("DEEPL_API_KEY")
 
 
@@ -16,6 +18,7 @@ def fetch_news() -> list:
   """
 
   """
+
   base_link = "https://www.allure.com"
   links = []
   articles: list = []

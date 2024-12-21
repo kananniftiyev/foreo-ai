@@ -3,7 +3,25 @@ import re
 import colorlog
 import logging
 
-
+def setup_logger() -> logging.Logger:
+  logger = logging.getLogger(__name__)
+  logger.setLevel(logging.DEBUG)
+  console_handler = logging.StreamHandler()
+  formatter = colorlog.ColoredFormatter(
+    "%(log_color)s%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",  # Date format
+    log_colors={
+        "DEBUG": "cyan",
+        "INFO": "green",
+        "WARNING": "yellow",
+        "ERROR": "red",
+        "CRITICAL": "bold_red",
+    },
+  )
+  console_handler.setFormatter(formatter)
+  logger.propagate = True
+  logger.addHandler(console_handler)
+  return logger
 
 def clean_article_text(article: str) -> str:
     """
