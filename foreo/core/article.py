@@ -32,7 +32,7 @@ def fetch_news() -> list:
 
     count = 0
     for link_to_headline in headlines:
-      if count >= 3:  # Check if we've already processed 3 headlines
+      if count >= 2:  # Check if we've already processed 2 headlines
         break
       count += 1
       links.append(link_to_headline.get("href"))
@@ -44,10 +44,15 @@ def fetch_news() -> list:
       article_response = requests.get(new_link)
       article_soup = BeautifulSoup(article_response.text, "html.parser")
       wrapper: Tag = article_soup.find_all("div", class_="body__inner-container")
-      base_article: str = ""
+
+      all_paragraphs = []  # Collect all <p> tags across all wrappers
       for i in wrapper:
-        for j in i.find_all("p"):
+          all_paragraphs.extend(i.find_all("p", recursive=False))
+
+      base_article: str = ""
+      for j in all_paragraphs[:-2]:  # Skip the last two <p> tags in total
           base_article += j.get_text()
+
 
       articles.append(base_article)
       logger.info(f"Got article from {new_link}")
@@ -59,7 +64,7 @@ def fetch_news() -> list:
 
   return articles
 
-
+# TODO: Summarize by two-two
 @elapsed_time(logger=logger)
 def summarize_articles(articles: list) -> list:
   """
