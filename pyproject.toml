@@ -16,6 +16,8 @@ selenium = "^4.27.1"
 python-dotenv = "^1.0.1"
 protobuf = "^5.29.2"
 sentencepiece = "^0.2.0"
+moviepy = "^2.1.1"
+gtts = "^2.5.4"
 
 
 [build-system]

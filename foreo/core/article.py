@@ -12,7 +12,6 @@ logger = setup_logger()
 
 DEEPL_API_KEY = os.getenv("DEEPL_API_KEY")
 
-
 # TODO: Add more resources
 def fetch_news() -> list:
   """
@@ -32,7 +31,7 @@ def fetch_news() -> list:
 
     count = 0
     for link_to_headline in headlines:
-      if count >= 2:  # Check if we've already processed 2 headlines
+      if count >= 3:  # Check if we've already processed 2 headlines
         break
       count += 1
       links.append(link_to_headline.get("href"))
