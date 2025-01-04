@@ -33,6 +33,7 @@ def summarize_for_video(summaries: list) -> str:
 
     return tokenizer.decode(summary_ids[0], skip_special_tokens=True)
 
+# TODO: Will fix things wait
 def create_video(summaries: List[str],
                 background_folder: str = "backgrounds",
                 output_path: str = "output.mp4",
@@ -193,7 +194,7 @@ def post_to_tiktok(video_file, access_token):
     # Step 1: Initialize upload
     init_url = "https://open.tiktokapis.com/v2/post/publish/inbox/video/init/"
     headers = {
-        "Authorization": f"Bearer {access_token}",
+        "Authorization": f"Bearer {os.getenv("TIKTOK_ACCESS_TOKEN")}",
         "Content-Type": "application/json"
     }
     init_payload = {
